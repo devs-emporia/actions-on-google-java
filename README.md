@@ -14,7 +14,7 @@
 
 ## build instructions
 
-mvn install:install-file -Dfile=lib/libactions_java_lib.jar -DgroupId=com.google.actions -DartifactId=actions-bindings -Dversion=2.0.0 -Dpackaging=jar -DgeneratePom=true
-mvn install:install-file -Dfile=lib/libdialogflow_java_lib.jar -DgroupId=com.google.actions -DartifactId=dialogflow-bindings -Dversion=2.0.0 -Dpackaging=jar -DgeneratePom=true
+$ mvn install:install-file -Dfile=lib/libactions_java_lib.jar -DgroupId=com.google.actions -DartifactId=actions-bindings -Dversion=2.0.0 -Dpackaging=jar -DgeneratePom=true \
+$ mvn install:install-file -Dfile=lib/libdialogflow_java_lib.jar -DgroupId=com.google.actions -DartifactId=dialogflow-bindings -Dversion=2.0.0 -Dpackaging=jar -DgeneratePom=true
 
-mvn install
+$ mvn install
