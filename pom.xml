@@ -33,17 +33,12 @@
     </license>
   </licenses>
 
-  <distributionManagement>
-    <!-- Note: The id (ossrh) must match the name of the server in ~/.m2/settings.xml -->
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
+  <distributionManagement> 
     <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
-      </url>
-    </repository>
+        <id>internal.repo</id> 
+        <name>Temporary Staging Repository</name> 
+        <url>file://${project.build.directory}/mvn-artifact</url> 
+    </repository> 
   </distributionManagement>
 
   <properties>
@@ -291,6 +286,28 @@
         </executions>
       </plugin>
       <plugin>
+	    <artifactId>maven-deploy-plugin</artifactId>
+	    <version>2.8.2</version>
+	    <configuration>
+		<altDeploymentRepository>
+		    internal.repo::default::file://${project.build.directory}/mvn-artifact
+		</altDeploymentRepository>
+	    </configuration>
+      </plugin>
+      <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-source-plugin</artifactId>
+	    <version>3.1.0</version>
+	    <executions>
+		<execution>
+		    <id>attach-sources</id>
+			<goals>
+			    <goal>jar</goal>
+			</goals>
+		</execution>
+	    </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.6</version>
@@ -378,6 +395,32 @@
           </execution>
         </executions>
       </plugin>
+    <plugin>
+    <groupId>com.github.github</groupId>
+    <artifactId>site-maven-plugin</artifactId>
+	    <version>0.12</version>
+	    <configuration>
+		<message>Maven artifacts for ${project.version}</message>
+		<noJekyll>true</noJekyll>
+		<outputDirectory>${project.build.directory}/mvn-artifact</outputDirectory>
+		<branch>refs/heads/main</branch>
+		<includes>
+		    <include>**/*</include>
+		</includes>
+		<merge>true</merge>
+		<repositoryName>artifact-repo</repositoryName>
+		<repositoryOwner>devs-emporia</repositoryOwner>
+		<server>github</server>
+	    </configuration>
+	    <executions>
+		<execution>
+		    <goals>
+			<goal>site</goal>
+		    </goals>
+		    <phase>deploy</phase>
+		</execution>
+	    </executions>
+    </plugin>
     </plugins>
   </build>
 
