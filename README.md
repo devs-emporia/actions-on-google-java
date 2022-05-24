@@ -11,6 +11,20 @@
 * add dependency for javax.annotation to allow compilation with java>8
 * remove jar signing
 
+* to allow publishing to github let mvn know your github account info
+~/.m2/settings
+
+<settings>
+    <servers> 
+        <server>
+            <id>github</id>
+            <username>devs-emporia</username>
+            <password>personal token value</password>
+        </server>
+    </servers>
+</settings>
+
+
 
 ## build instructions
 
