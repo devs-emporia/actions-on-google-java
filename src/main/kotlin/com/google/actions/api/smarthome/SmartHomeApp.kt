@@ -24,6 +24,8 @@ import io.grpc.ManagedChannelBuilder
 import io.grpc.auth.MoreCallCredentials
 import java.io.FileInputStream
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+
 
 abstract class SmartHomeApp : App {
     var credentials: GoogleCredentials? = null
@@ -129,7 +131,16 @@ abstract class SmartHomeApp : App {
                 // See https://grpc.io/docs/guides/auth.html#authenticate-with-google-3.
                 .withCallCredentials(MoreCallCredentials.from(this.credentials))
 
-        return blockingStub.reportStateAndNotification(request)
+        val response =  blockingStub.reportStateAndNotification(request)
+        // this logic is not in the master repository
+        // in an AWS lambda environment the channel gets shutdown arbitrarily
+        // producing errors described here:
+        // https://github.com/actions-on-google/actions-on-google-java/pull/53
+
+        if (! channel.isShutdown() ) {
+            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+        }
+        return response
 
     }
 
