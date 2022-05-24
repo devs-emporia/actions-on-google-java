@@ -12,12 +12,9 @@
 * remove jar signing
 
 
-## build
+## build instructions
 
-### install provided jars in lib directory to your local m2
 mvn install:install-file -Dfile=lib/libactions_java_lib.jar -DgroupId=com.google.actions -DartifactId=actions-bindings -Dversion=2.0.0 -Dpackaging=jar -DgeneratePom=true
 mvn install:install-file -Dfile=lib/libdialogflow_java_lib.jar -DgroupId=com.google.actions -DartifactId=dialogflow-bindings -Dversion=2.0.0 -Dpackaging=jar -DgeneratePom=true
-
-### build and install locally
 
 mvn install
