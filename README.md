@@ -13,7 +13,7 @@
 
 * to allow publishing to github let mvn know your github account info
 ~/.m2/settings
-
+```
 <settings>
     <servers> 
         <server>
@@ -23,6 +23,7 @@
         </server>
     </servers>
 </settings>
+```
 
 
 
