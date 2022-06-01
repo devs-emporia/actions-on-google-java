@@ -21,6 +21,7 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.home.graph.v1.HomeGraphApiServiceGrpc
 import com.google.home.graph.v1.HomeGraphApiServiceProto
 import io.grpc.ManagedChannelBuilder
+import io.grpc.ManagedChannel
 import io.grpc.auth.MoreCallCredentials
 import java.io.FileInputStream
 import java.util.concurrent.CompletableFuture
@@ -120,25 +121,38 @@ abstract class SmartHomeApp : App {
      * @param request A payload containing a series of devices and their connected states
      * @return A response to the API call
      */
+
+
+
     fun reportState(request: HomeGraphApiServiceProto.ReportStateAndNotificationRequest):
             HomeGraphApiServiceProto.ReportStateAndNotificationResponse {
-        if (this.credentials == null) {
-            throw IllegalArgumentException("You must pass credentials in the app constructor")
+	
+	lateinit var response: HomeGraphApiServiceProto.ReportStateAndNotificationResponse 
+        lateinit var channel: ManagedChannel
+        try {
+		if (this.credentials == null) {
+		    throw IllegalArgumentException("You must pass credentials in the app constructor")
+		}
+
+	        channel = ManagedChannelBuilder.forTarget("homegraph.googleapis.com").build()
+
+		val blockingStub = HomeGraphApiServiceGrpc.newBlockingStub(channel)
+			// See https://grpc.io/docs/guides/auth.html#authenticate-with-google-3.
+			.withCallCredentials(MoreCallCredentials.from(this.credentials))
+
+		response =  blockingStub.reportStateAndNotification(request)
+		// this logic is not in the master repository
+		// in an AWS lambda environment the channel gets shutdown arbitrarily
+		// producing errors described here:
+		// https://github.com/actions-on-google/actions-on-google-java/pull/53
         }
-        val channel = ManagedChannelBuilder.forTarget("homegraph.googleapis.com").build()
 
-        val blockingStub = HomeGraphApiServiceGrpc.newBlockingStub(channel)
-                // See https://grpc.io/docs/guides/auth.html#authenticate-with-google-3.
-                .withCallCredentials(MoreCallCredentials.from(this.credentials))
-
-        val response =  blockingStub.reportStateAndNotification(request)
-        // this logic is not in the master repository
-        // in an AWS lambda environment the channel gets shutdown arbitrarily
-        // producing errors described here:
-        // https://github.com/actions-on-google/actions-on-google-java/pull/53
-
-        if (! channel.isShutdown() ) {
-            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+        finally { 
+           channel?.let {
+              if ( ! channel.isShutdown() ) {
+                channel.shutdownNow()
+              }
+           }
         }
         return response
 
