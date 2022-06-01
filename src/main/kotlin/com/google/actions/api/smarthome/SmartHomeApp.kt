@@ -127,7 +127,6 @@ abstract class SmartHomeApp : App {
     fun reportState(request: HomeGraphApiServiceProto.ReportStateAndNotificationRequest):
             HomeGraphApiServiceProto.ReportStateAndNotificationResponse {
 	
-	lateinit var response: HomeGraphApiServiceProto.ReportStateAndNotificationResponse 
         lateinit var channel: ManagedChannel
         try {
 		if (this.credentials == null) {
@@ -140,7 +139,7 @@ abstract class SmartHomeApp : App {
 			// See https://grpc.io/docs/guides/auth.html#authenticate-with-google-3.
 			.withCallCredentials(MoreCallCredentials.from(this.credentials))
 
-		response =  blockingStub.reportStateAndNotification(request)
+		return blockingStub.reportStateAndNotification(request)
 		// this logic is not in the master repository
 		// in an AWS lambda environment the channel gets shutdown arbitrarily
 		// producing errors described here:
@@ -154,8 +153,6 @@ abstract class SmartHomeApp : App {
               }
            }
         }
-        return response
-
     }
 
     override fun handleRequest(inputJson: String?, headers: Map<*, *>?): CompletableFuture<String> {
